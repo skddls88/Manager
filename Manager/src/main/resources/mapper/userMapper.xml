@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.exam.mapper.empMapper">
+	<select id="login" resultType="com.exam.dto.UserVO">
+		SELECT
+			ID, PASS, NAME
+		FROM
+			EXAM_MANAGER.USERINFO
+		WHERE
+			ID = #{id}
+			and PASS = #{pass}
+	</select>
+	<select id="idcheck" resultType="com.exam.dto.UserVO">
+		SELECT
+			ID
+		FROM
+			EXAM_MANAGER.USERINFO
+		WHERE
+			ID = #{id}
+	</select>
+	<insert id="insertUser">
+		INSERT INTO
+			USERINFO(ID, PASS, NAME, INSDATE)
+		VALUES
+			(#{id}, #{pass}, #{name}, to_char(sysdate, 'yy/mm/dd'))
+	</insert>
+	<insert id="insertUserDetail">
+		INSERT INTO
+			USERINFODETAIL(ID, USERINFODETAILCD, DELIVNAME, RELCD, ADDRCD, ADDRNAME, MOBILETELNO, HOMETELNO, USEYN, INSDATE, INSUSER)
+		VALUES
+			(#{id}, (select 'U'||(LPAD(MAX(to_number(substr(USERINFODETAILCD,2)))+1, 8, '0')) FROM USERINFODETAIL), #{delivname}, #{relcd}, #{addrcd}, #{addrname}, #{mobiletelno}, #{hometelno}, #{useyn}, to_char(sysdate, 'yy/mm/dd'), #{id})
+	</insert>
+</mapper>

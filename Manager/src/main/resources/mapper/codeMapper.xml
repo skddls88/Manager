@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.exam.mapper.codeMapper">
+	<select id="codeAll" resultType="com.exam.dto.CodeVO">
+		SELECT 
+			CDNO, CDLVL, UPCD, CDNAME,
+        	INSUSER, INSDATE, USEYN
+		FROM CODEMNG
+		START WITH CDNO='C0000'
+		CONNECT BY PRIOR CDNO = UPCD
+	</select>
+	<update id="updateCode" parameterType="map">
+		UPDATE
+			CODEMNG
+		SET
+			CDLVL = #{cdlvl},
+			UPCD = #{upcd},
+			CDNAME = #{cdname},
+			USEYN = #{useyn}
+		WHERE
+			CDNO = #{cdno}
+	</update>
+	<select id="cdlvlCheck" resultType="com.exam.dto.CodeVO">
+		SELECT
+			CDNO
+		FROM
+			CODEMNG
+		WHERE
+			CDNO = #{upcd}
+		AND
+			cdlvl = #{cdlvl}
+	</select>
+	<insert id="insertCode">
+	INSERT INTO
+			CODEMNG(UPCD, CDNO, CDLVL, CDNAME, USEYN, INSUSER, INSDATE)
+		VALUES
+			(
+			#{upcd},
+			(select 'C'||(LPAD(MAX(to_number(substr(cdno,2)))+1, 4, '0')) FROM CODEMNG),
+				 #{cdlvl}, #{cdname}, #{useyn}, '관리자', to_char(sysdate, 'yy/mm/dd')
+			)
+	</insert>
+	<select id="codeCategory" resultType="com.exam.dto.CodeVO">
+		SELECT
+			CDNAME
+		FROM 
+			CODEMNG 
+		WHERE 
+			CDLVL = 2
+	</select>
+	<select id="codeNumber" resultType="com.exam.dto.CodeVO">
+		SELECT
+			CDNO
+		FROM 
+			CODEMNG 
+		WHERE 
+			CDLVL = 2
+		AND
+			CDNAME = #{category}
+	</select>
+	<select id="codeCategory2" resultType="com.exam.dto.CodeVO">
+		SELECT
+			CDNAME, UPNO
+		FROM 
+			CODEMNG 
+		WHERE 
+			CDLVL = 3
+		AND
+			UPNO = #{cdno}
+	</select>
+</mapper>
